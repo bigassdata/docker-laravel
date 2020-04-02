@@ -33,28 +33,11 @@ services:
 #    ports:
 #        - "3306:3306"
 
-#  pgsql:
-#    image: postgres:9.6-alpine
-#    volumes:
-#      - pgsqldata:/var/lib/postgresql/data
-#    environment:
-#      - "POSTGRES_DB=homestead"
-#      - "POSTGRES_USER=homestead"
-#      - "POSTGRES_PASSWORD=homestead"
-#    ports:
-#        - "5432:5432"
-
   redis:
     image: redis:4.0-alpine
     command: redis-server --appendonly yes
 #    ports:
 #        - "6379:6379"
 
-#  elastic:
-#    image: elasticsearch:5.5-alpine
-#    ports:
-#        - "9200:9200"
-
 volumes:
   mysqldata:
-  pgsqldata:
