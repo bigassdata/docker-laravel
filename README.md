@@ -8,12 +8,18 @@ This repository provides you a development environment without requiring you to 
 
 2. Copy `docker-compose.yml` file to your project root path, and edit it according to your needs ;
 
-3. From your project directory, start up your application by running:
+3. Authenticate with docker
+```
+aws ecr get-login-password --profile senseme | docker login --username AWS --password-stdin 903045850431.dkr.ecr.us-east-1.amazonaws.com
+
+```
+
+4. From your project directory, start up your application by running:
 
 ```sh
 docker-compose up
 ```
-4. If you want, you can run composer or artisan through docker. For instance:
+5. If you want, you can run composer or artisan through docker. For instance:
 
 ```sh
 docker-compose exec php composer install

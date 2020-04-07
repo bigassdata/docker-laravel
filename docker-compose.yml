@@ -2,7 +2,7 @@ version: '2'
 services:
 
   php:
-    image: jguyomard/laravel-php:7.3
+    image: 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-php:7.3
     volumes:
       - ./:/var/www/
       - $HOME/.composer/:$HOME/.composer/
@@ -15,7 +15,7 @@ services:
       - "REDIS_PORT=6379"
 
   nginx:
-    image: jguyomard/laravel-nginx:1.13
+    image: 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-nginx:1.13
     volumes_from:
       - php
     ports:
