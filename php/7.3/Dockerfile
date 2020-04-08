@@ -36,7 +36,7 @@ RUN apk add --no-cache --virtual .build-deps \
     xml \
     zip \
     intl \
-    && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
+    && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=1.9.3 \
     && apk del -f .build-deps
 
 WORKDIR /var/www
