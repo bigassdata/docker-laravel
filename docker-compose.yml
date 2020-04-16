@@ -1,10 +1,10 @@
 version: '2'
 services:
 
-  php:
+  app:
     image: 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-php:7.3
     volumes:
-      - ./:/var/www/
+      - ./:/var/www/html/
       - $HOME/.composer/:$HOME/.composer/
     environment:
       - "DB_HOST=mysql"
@@ -14,10 +14,10 @@ services:
       - "REDIS_HOST=redis"
       - "REDIS_PORT=6379"
 
-  nginx:
-    image: 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-nginx:1.13
+  web:
+    image: nginx:1.13-alpine
     volumes_from:
-      - php
+      - app
     ports:
       - 8080:80
 

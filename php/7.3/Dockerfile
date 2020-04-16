@@ -11,32 +11,32 @@ RUN apk add --no-cache --virtual .build-deps \
     postgresql-dev \
     sqlite-dev \
     && apk add --no-cache \
-    curl \
-    git \
-    imagemagick \
-    mysql-client \
-    postgresql-libs \
-    libintl \
-    icu \
-    icu-dev \
-    libzip-dev \
+        curl \
+        git \
+        imagemagick \
+        mysql-client \
+        postgresql-libs \
+        libintl \
+        icu \
+        icu-dev \
+        libzip-dev \
     && pecl install imagick \
     && docker-php-ext-enable imagick \
     && docker-php-ext-install \
-    bcmath \
-    curl \
-    iconv \
-    mbstring \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    pcntl \
-    tokenizer \
-    xml \
-    zip \
-    intl \
+        bcmath \
+        curl \
+        iconv \
+        mbstring \
+        pdo \
+        pdo_mysql \
+        pdo_pgsql \
+        pdo_sqlite \
+        pcntl \
+        tokenizer \
+        xml \
+        zip \
+        intl \
     && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=1.9.3 \
     && apk del -f .build-deps
 
-WORKDIR /var/www
+# php-fpm WORKDIR is /var/www/html

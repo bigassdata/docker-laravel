@@ -1,6 +1,13 @@
 # Docker Images for Laravel development
 This repository provides you a development environment without requiring you to install PHP, a web server, and any other server software on your local machine. For this, it requires Docker and Docker Compose.
 
+## Philosophy
+
+When using docker images for development, we want to bind our source directories to the source directories on the host.
+
+When using docker images for production, we want to copy our source directories to an image built on top of the base images that we used for development.
+
+The docker images in this repository are for development purposes, and serve as the foundation for the production images.
 
 ## Installation
 
@@ -22,21 +29,25 @@ docker-compose up
 5. If you want, you can run composer or artisan through docker. For instance:
 
 ```sh
-docker-compose exec php composer install
-docker-compose exec php php artisan migrate
-docker-compose exec php $yourCommandHere
+docker-compose exec app composer install
+docker-compose exec app php artisan migrate
+docker-compose exec app $yourCommandHere
 ```
 
+## NGINX Image
 
-## Docker Images
+This project uses the official NGINX image on alpine.  To configure the NGINX image, you may want to map or copy your own conf file in place of `/etc/nginx/nginx.conf`.  You may also want to add additional files in `/etc/nginx/conf.d`.  This can include your own `default.conf` and other configuration files.
+
+
+## Docker Image
 
 These docker images are configured in `docker-compose.yml` file.
 You can comment or uncomment some services according to your project.
 
-* [`laravel-php:7.3`](https://hub.docker.com/r/jguyomard/laravel-php/) (this docker image extends `php:7.3-fpm-alpine` to add some PHP extensions) ;
-* [`laravel-nginx:1.13`](https://hub.docker.com/r/jguyomard/laravel-nginx/) (this docker image extends `nginx:1.13-alpine` to add Laravel vhost) ;
-* `mysql:5.7` ;
-* `redis:4.0-alpine` ;
+* `laravel-php:latest` ; # this docker image extends `php:7.3-fpm-alpine` to add some PHP extensions)
+* `nginx:1.13-alpine` ;  # this is the official docker image for nginx and can be used as a foundation for production images
+* `mysql:5.7` ;          # development purposes only
+* `redis:4.0-alpine` ;   # development purposes only
 
 ## Building the PHP Image
 
