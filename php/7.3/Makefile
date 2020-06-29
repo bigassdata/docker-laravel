@@ -58,7 +58,7 @@ publish: repo-login publish-latest publish-version publish-major publish-major-m
 publish-latest: tag-latest ## Publish the `latest` tagged container to ECR
 	@echo 'publish latest to $(DOCKER_REPO)'
 	docker push $(DOCKER_REPO)/$(APP_NAME):latest
-	@echo 'publish latest supervisor to $(DOCKER_REPO)
+	@echo 'publish latest supervisor to $(DOCKER_REPO)'
 	docker push $(DOCKER_REPO)/$(APP_NAME)-supervisor:latest
 
 publish-version: tag-version ## Publish the `{version}` tagged container to ECR
