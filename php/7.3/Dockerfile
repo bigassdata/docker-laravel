@@ -1,4 +1,4 @@
-FROM php:7.3-fpm-alpine
+FROM php:7.3-fpm-alpine as php-fpm-base
 
 LABEL maintainer="Bill Kidwell <bill.kidwell@bigassfans.com>" company="Big Ass Fans"
 
@@ -39,4 +39,17 @@ RUN apk add --no-cache --virtual .build-deps \
     && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=1.9.3 \
     && apk del -f .build-deps
 
+# Add bash for some utility
+RUN apk add --no-cache --upgrade bash
+
 # php-fpm WORKDIR is /var/www/html
+
+FROM php-fpm-base as docker-laravel-supervisor
+
+RUN apk add --update supervisor && rm  -rf /tmp/* /var/cache/apk/*
+
+ADD conf/supervisord.conf /etc/supervisord.conf
+
+# The purpose of this image is to be extended and have multiple processes in a single container.
+# To do this, add configs to /etc/supervisor/conf.d/. Each layer can have its own processes.
+ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]
