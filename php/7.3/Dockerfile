@@ -39,8 +39,20 @@ RUN apk add --no-cache --virtual .build-deps \
     && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=1.9.3 \
     && apk del -f .build-deps
 
+# Add npm (LTS version)
+RUN apk update && apk add \
+    python \
+    make \
+    g++ \
+    nodejs \
+    nodejs-npm
+
 # Add bash for some utility
 RUN apk add --no-cache --upgrade bash
+
+# aws-env to get environment variables from AWS SSM
+RUN wget https://github.com/Droplr/aws-env/raw/master/bin/aws-env-linux-amd64 -O /bin/aws-env && \
+  chmod +x /bin/aws-env
 
 # php-fpm WORKDIR is /var/www/html
 
