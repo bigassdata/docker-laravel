@@ -1,4 +1,4 @@
-FROM php:7.3-fpm-alpine as php-fpm-base
+FROM php:7.3-fpm-alpine
 
 LABEL maintainer="Bill Kidwell <bill.kidwell@bigassfans.com>" company="Big Ass Fans"
 
@@ -55,13 +55,3 @@ RUN wget https://github.com/Droplr/aws-env/raw/master/bin/aws-env-linux-amd64 -O
   chmod +x /bin/aws-env
 
 # php-fpm WORKDIR is /var/www/html
-
-FROM php-fpm-base as docker-laravel-supervisor
-
-RUN apk add --update supervisor && rm  -rf /tmp/* /var/cache/apk/*
-
-ADD conf/supervisord.conf /etc/supervisord.conf
-
-# The purpose of this image is to be extended and have multiple processes in a single container.
-# To do this, add configs to /etc/supervisor/conf.d/. Each layer can have its own processes.
-ENTRYPOINT ["supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]

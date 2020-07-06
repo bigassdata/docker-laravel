@@ -2,42 +2,14 @@ version: '2'
 services:
 
   app:
-    image: 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-php:7.3
+    # image: 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-php:latest
+    image: laravel-php:latest
     volumes:
       - ./:/var/www/html/
       - $HOME/.composer/:$HOME/.composer/
-    environment:
-      - "DB_HOST=mysql"
-      - "DB_DATABASE=homestead"
-      - "DB_USERNAME=homestead"
-      - "DB_PASSWORD=homestead"
-      - "REDIS_HOST=redis"
-      - "REDIS_PORT=6379"
-
   web:
     image: nginx:1.13-alpine
     volumes_from:
       - app
     ports:
       - 8080:80
-
-  mysql:
-    image: mysql:5.7
-    volumes:
-      - mysqldata:/var/lib/mysql
-    environment:
-      - "MYSQL_ROOT_PASSWORD=secret"
-      - "MYSQL_DATABASE=homestead"
-      - "MYSQL_USER=homestead"
-      - "MYSQL_PASSWORD=homestead"
-#    ports:
-#        - "3306:3306"
-
-  redis:
-    image: redis:4.0-alpine
-    command: redis-server --appendonly yes
-#    ports:
-#        - "6379:6379"
-
-volumes:
-  mysqldata:
