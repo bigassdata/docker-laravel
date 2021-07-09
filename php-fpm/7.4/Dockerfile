@@ -1,4 +1,4 @@
-FROM php:7.3-cli-alpine
+FROM php:7.4-fpm-alpine
 
 LABEL maintainer="Bill Kidwell <bill.kidwell@bigassfans.com>" company="Big Ass Fans"
 
@@ -7,14 +7,10 @@ RUN apk add --no-cache --virtual .build-deps \
     curl-dev \
     libtool \
     libxml2-dev \
-    postgresql-dev \
-    sqlite-dev \
     && apk add --no-cache \
         curl \
         git \
-        imagemagick \
         mysql-client \
-        postgresql-libs \
         libintl \
         icu \
         icu-dev \
@@ -23,35 +19,28 @@ RUN apk add --no-cache --virtual .build-deps \
         bcmath \
         curl \
         iconv \
-        mbstring \
         pdo \
         pdo_mysql \
-        pdo_pgsql \
-        pdo_sqlite \
         pcntl \
         tokenizer \
         xml \
         zip \
         intl \
         sockets \
+    && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=2.1.3 \
     && apk del -f .build-deps
 
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install xdebug \
-    && docker-php-ext-enable xdebug \
-    && apk del -f .build-deps
-
-# Copy our local, customized ini to the image
-COPY php.ini-development "$PHP_INI_DIR/php.ini"
-
-# Add npm (LTS version)
+# Tools we need in addition to nodejs
 RUN apk update && apk add \
-    python3 \
     make \
-    g++
+    g++ \
+    bash
 
-# Add bash for some utility
-RUN apk add --no-cache --upgrade bash
+# node, and npm at specific versions
+RUN apk add  --no-cache \
+    --repository http://dl-cdn.alpinelinux.org/alpine/v3.10/main/ \
+    nodejs=10.24.1-r0 \
+    npm=10.24.1-r0 \
+    python
 
 # php-fpm WORKDIR is /var/www/html
-WORKDIR /app

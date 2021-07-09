@@ -1,10 +1,11 @@
-FROM php:7.3-cli-alpine
+FROM php:7.4-cli-alpine
 
 LABEL maintainer="Bill Kidwell <bill.kidwell@bigassfans.com>" company="Big Ass Fans"
 
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
     curl-dev \
+    imagemagick-dev \
     libtool \
     libxml2-dev \
     postgresql-dev \
@@ -19,11 +20,12 @@ RUN apk add --no-cache --virtual .build-deps \
         icu \
         icu-dev \
         libzip-dev \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
     && docker-php-ext-install \
         bcmath \
         curl \
         iconv \
-        mbstring \
         pdo \
         pdo_mysql \
         pdo_pgsql \
@@ -35,14 +37,6 @@ RUN apk add --no-cache --virtual .build-deps \
         intl \
         sockets \
     && apk del -f .build-deps
-
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-    && pecl install xdebug \
-    && docker-php-ext-enable xdebug \
-    && apk del -f .build-deps
-
-# Copy our local, customized ini to the image
-COPY php.ini-development "$PHP_INI_DIR/php.ini"
 
 # Add npm (LTS version)
 RUN apk update && apk add \
