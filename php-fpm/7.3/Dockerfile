@@ -18,7 +18,7 @@ RUN apk add --no-cache --virtual .build-deps \
     && docker-php-ext-install \
         bcmath \
         curl \
-        iconv \
+        # iconv \
         mbstring \
         pdo \
         pdo_mysql \
@@ -30,6 +30,9 @@ RUN apk add --no-cache --virtual .build-deps \
         sockets \
     && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=1.9.3 \
     && apk del -f .build-deps
+
+# Copy our local, customized ini to the image
+COPY php.ini-production "$PHP_INI_DIR/php.ini"
 
 # Tools we need in addition to nodejs
 RUN apk update && apk add \
