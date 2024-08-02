@@ -1,6 +1,6 @@
 FROM php:7.3-fpm-alpine
 
-LABEL maintainer="Bill Kidwell <bill.kidwell@bigassfans.com>" company="Big Ass Fans"
+LABEL maintainer="Jason Bishop<jason.bishop@bigassfans.com>" company="Big Ass Fans"
 
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
