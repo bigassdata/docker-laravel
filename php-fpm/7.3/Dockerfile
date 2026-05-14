@@ -8,26 +8,26 @@ RUN apk add --no-cache --virtual .build-deps \
     libtool \
     libxml2-dev \
     && apk add --no-cache \
-        curl \
-        git \
-        mysql-client \
-        libintl \
-        icu \
-        icu-dev \
-        libzip-dev \
+    curl \
+    git \
+    mysql-client \
+    libintl \
+    icu \
+    icu-dev \
+    libzip-dev \
     && docker-php-ext-install \
-        bcmath \
-        curl \
-        # iconv \
-        mbstring \
-        pdo \
-        pdo_mysql \
-        pcntl \
-        tokenizer \
-        xml \
-        zip \
-        intl \
-        sockets \
+    bcmath \
+    curl \
+    # iconv \
+    mbstring \
+    pdo \
+    pdo_mysql \
+    pcntl \
+    tokenizer \
+    xml \
+    zip \
+    intl \
+    sockets \
     && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=1.9.3 \
     && apk del -f .build-deps
 
