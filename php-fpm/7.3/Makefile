@@ -11,6 +11,7 @@ include $(dpl)
 export $(shell sed 's/=.*//' $(dpl))
 
 VERSION=$(MAJOR).$(MINOR).$(PATCH)
+BUILD_PLATFORM=linux/amd64
 
 
 # HELP
@@ -27,10 +28,12 @@ help: ## This help.
 # DOCKER TASKS
 # Build the container
 build: ## Build the container
-	docker build -t $(APP_NAME) .
+	@echo 'Building image for $(BUILD_PLATFORM)'
+	docker build --platform $(BUILD_PLATFORM) -t $(APP_NAME) .
 
 build-nc: ## Build the container without caching
-	docker build --no-cache -t $(APP_NAME) .
+	@echo 'Building image for $(BUILD_PLATFORM) (no cache)'
+	docker build --platform $(BUILD_PLATFORM) --no-cache -t $(APP_NAME) .
 
 run: ## Run container on port configured in `config.env`
 	docker run -i -t --rm --env-file=./config.env -p=$(PORT):$(PORT) --name="$(APP_NAME)" $(APP_NAME)
