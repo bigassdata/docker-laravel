@@ -28,6 +28,11 @@ RUN apk add --no-cache --virtual .build-deps \
     zip \
     intl \
     sockets \
+    && git clone --depth 1 --branch v1.1.1 https://github.com/BitOne/php-meminfo.git /usr/src/php/ext/meminfo \
+    && docker-php-ext-configure meminfo --enable-meminfo \
+    && docker-php-ext-install meminfo \
+    && docker-php-ext-enable meminfo \
+    && rm -rf /usr/src/php/ext/meminfo \
     && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer --version=1.9.3 \
     && apk del -f .build-deps
 
