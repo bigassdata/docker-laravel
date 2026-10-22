@@ -44,52 +44,38 @@ This project uses the official NGINX image on alpine.  To configure the NGINX im
 These docker images are configured in `docker-compose.yml` file.
 You can comment or uncomment some services according to your project.
 
-* `laravel-php:latest` ; # this docker image extends `php:7.3-fpm-alpine` to add some PHP extensions)
+* `laravel-php:<version>` ; # the Base image: PHP 7.4.33 built from source with the official CVE-2026-109618/109619 backport, plus the extensions, php.ini and tools (Composer 1.9.3, Node 10) every App image needs. Source: `php-fpm/7.4`
 * `nginx:1.13-alpine` ;  # this is the official docker image for nginx and can be used as a foundation for production images
 * `mysql:5.7` ;          # development purposes only
 * `redis:4.0-alpine` ;   # development purposes only
 
+`php-fpm/7.3`, `php-cli/7.3` and `php-cli/7.4` are the previous images and are no longer maintained.
+
+Why we build PHP ourselves: [docs/adr/0001-build-php-from-official-backport.md](docs/adr/0001-build-php-from-official-backport.md). Background and rollout plan: [docs/php-7.4-cve-migration.md](docs/php-7.4-cve-migration.md).
+
 ## Building the PHP Image
 
 ```bash
-cd php/7.3
-make build # build the image
-```
-You can test the image locally.  When you are happy with it you can update the version in config.env
-
-To publish the image to the repository with semantic versioned tags, run:
-```
-make publish
+cd php-fpm/7.4
+make build   # build for linux/amd64 (the first build compiles PHP, ~3-5 minutes)
+make test    # check the image: PHP + backport, extensions, php.ini, tools
 ```
 
-For version 1.2.3 this will tag the images as `latest`, `1.2.3`, `1.2` and `1`.  If you need to publish some subset of these, you can manually publish as appropriate.
+To publish, bump the version in `config.env`, then:
 
-You can see a variety of options by running `make` or `make help`
-
+```bash
+make release   # build without cache, test, push `<version>` to ECR, print the digest
 ```
-help                           This help.
-build                          Build the container
-build-nc                       Build the container without caching
-run                            Run container on port configured in `config.env`
-up                             Run container on port configured in `config.env` (Alias to run)
-stop                           Stop and remove a running container
-release                        Make a release by building and publishing tagged containers to ECR
-publish                        Publish `latest` and semantic version tagged containers to ECR
-publish-latest                 Publish the `latest` tagged container to ECR
-publish-version                Publish the `{version}` tagged container to ECR
-publish-major                  Publish the `MAJOR` tagged container to ECR
-publish-major-minor            Publish the `MAJOR.MINOR` tagged container to ECR
-tag                            Generate container tags for the `{version}` and `latest` tags
-tag-latest                     Generate container `{version}` tag
-tag-version                    Generate container `latest` tag
-tag-major                      Generate container `major` tag
-tag-major-minor                Generate container `major.minor` tag
-repo-login                     Auto login to AWS-ECR unsing aws-cli
+
+Only the immutable `<version>` tag is published (no `latest`, `MAJOR` or `MAJOR.MINOR` tags), and `make publish` refuses to overwrite a version that already exists in ECR. It pushes only after ECR explicitly reports the tag as missing, so any other lookup error (expired credentials, missing `ecr:DescribeImages` permission, network) aborts the publish. App images pin the Base image by tag **and** digest, using the line `make publish` prints:
+
+```dockerfile
+FROM 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-php:9.0.0@sha256:<digest>
 ```
-To pull the php image from the repo, use the following command.
 
-`docker pull 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-php:latest`
+### Updating the PHP patch
 
+`php-fpm/7.4/php/` holds the `docker-php-*` scripts from docker-library (`github.com/docker-library/php` at `f2999de8^`, `7.4/alpine3.16/fpm`) and the backport patch. To pick up a new upstream backport, export it from php-src with `git format-patch -1 <commit>`, then update the patch file and `PHP_CVE_PATCH_SHA256` in the Dockerfile.
 
 ## Contributing
 
