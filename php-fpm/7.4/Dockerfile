@@ -1,9 +1,11 @@
+# check=skip=LegacyKeyValueFormat
 # Base image (laravel-php): PHP 7.4.33 + the official CVE-2026-109618/109619 backport,
 # plus the extensions, ini and tools every App image needs.
 #
 # Stage "php": docker-library's last official php:7.4-fpm-alpine3.16 recipe
 # (github.com/docker-library/php at f2999de8^, 7.4/alpine3.16/fpm), unchanged except
 # for applying the backport patch. Keep it that way so it stays easy to diff.
+# (That is why the LegacyKeyValueFormat lint is skipped above: upstream uses `ENV key value`.)
 # Stage "base": our additions.
 
 FROM alpine:3.16@sha256:452e7292acee0ee16c332324d7de05fa2c99f9994ecc9f0779c602916a672ae4 AS php
