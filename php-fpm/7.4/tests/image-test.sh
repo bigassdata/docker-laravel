@@ -44,6 +44,17 @@ for ext in bcmath ctype curl dom fileinfo iconv intl json mbstring openssl pcntl
 done
 # GNU libiconv, not musl's iconv, which breaks //TRANSLIT.
 expect "iconv implementation" "libiconv" "$(php -r 'echo ICONV_IMPL;')"
+# php-meminfo, used by api's MemoryProfiler middleware.
+if php -r 'exit(extension_loaded("meminfo") && function_exists("meminfo_dump") ? 0 : 1);'; then
+    pass "extension meminfo is loaded (meminfo_dump exists)"
+else
+    fail "extension meminfo is loaded (meminfo_dump exists)"
+fi
+if php -r '$f = fopen("php://memory", "w+"); meminfo_dump($f); rewind($f); exit(is_array(json_decode(stream_get_contents($f), true)) ? 0 : 1);' 2>/dev/null; then
+    pass "meminfo_dump writes valid JSON"
+else
+    fail "meminfo_dump writes valid JSON"
+fi
 
 # --- php.ini: 7.4 php.ini-production plus our customisations ---
 expect "memory_limit" "512M" "$(ini memory_limit)"

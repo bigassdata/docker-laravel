@@ -274,6 +274,11 @@ FROM php AS base
 
 LABEL maintainer="Jason Bishop<jason.bishop@bigassfans.com>" company="Big Ass Fans"
 
+# php-meminfo, as in the 7.3 image: api's MemoryProfiler middleware calls meminfo_dump().
+# The tag is pinned to its commit so a moved tag fails the build.
+ENV MEMINFO_VERSION=v1.1.1 \
+    MEMINFO_COMMIT=8dfdb2a72d2fd984bfcec5596a1605d618d0f631
+
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
     curl-dev \
@@ -298,6 +303,14 @@ RUN apk add --no-cache --virtual .build-deps \
         zip \
         intl \
         sockets \
+    && git clone --depth 1 --branch "${MEMINFO_VERSION}" https://github.com/BitOne/php-meminfo.git /tmp/php-meminfo \
+    && test "$(git -C /tmp/php-meminfo rev-parse HEAD)" = "${MEMINFO_COMMIT}" \
+    && docker-php-source extract \
+    && cp -r /tmp/php-meminfo/extension/php7 /usr/src/php/ext/meminfo \
+    && docker-php-ext-configure meminfo --enable-meminfo \
+    && docker-php-ext-install meminfo \
+    && docker-php-source delete \
+    && rm -rf /tmp/php-meminfo \
     && apk del -f .build-deps
 
 # Composer 1.9.3, the version production builds with (sha256 from getcomposer.org/download/1.9.3/composer.phar.sha256sum)
