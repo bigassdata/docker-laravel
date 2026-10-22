@@ -47,14 +47,22 @@ up: build run ## Run container on port configured in `config.env` (Alias to run)
 stop: ## Stop and remove a running container
 	docker stop $(APP_NAME); docker rm $(APP_NAME)
 
-release: build-nc test publish ## Make a release: build without cache, test, publish to ECR
+# Sequential sub-makes, not prerequisites: with `make -j` or `-k`, prerequisites could
+# publish an image that hasn't been rebuilt or hasn't passed `test`.
+release: ## Make a release: build without cache, test, publish to ECR
+	$(MAKE) build-nc && $(MAKE) test && $(MAKE) publish
 
 # Docker publish
 # Only the immutable `{version}` tag is published. App images pin it by tag + digest,
 # so there are deliberately no `latest`, `MAJOR` or `MAJOR.MINOR` tags.
+# Publishing continues only on an explicit ImageNotFoundException; any other lookup
+# error (expired credentials, denied access, network) aborts.
 publish: repo-login tag ## Publish the `{version}` tagged container to ECR and print its digest
-	@if docker manifest inspect $(DOCKER_REPO)/$(APP_NAME):$(VERSION) >/dev/null 2>&1; then \
+	@out=$$(aws ecr describe-images $(AWS_CLI_FLAGS) --repository-name $(APP_NAME) --image-ids imageTag=$(VERSION) 2>&1); rc=$$?; \
+	if [ $$rc -eq 0 ]; then \
 		echo 'ERROR: $(DOCKER_REPO)/$(APP_NAME):$(VERSION) already exists in ECR; bump the version in $(cnf)'; exit 1; \
+	elif ! printf '%s\n' "$$out" | grep -q ImageNotFoundException; then \
+		echo 'ERROR: could not confirm that $(APP_NAME):$(VERSION) is absent from ECR:'; printf '%s\n' "$$out"; exit 1; \
 	fi
 	@echo 'publish $(VERSION) to $(DOCKER_REPO)'
 	docker push $(DOCKER_REPO)/$(APP_NAME):$(VERSION)
@@ -67,6 +75,14 @@ tag: ## Generate container `{version}` tag
 	docker tag $(APP_NAME) $(DOCKER_REPO)/$(APP_NAME):$(VERSION)
 
 # HELPERS
+
+AWS_CLI_FLAGS :=
+ifdef AWS_CLI_PROFILE
+AWS_CLI_FLAGS += --profile $(AWS_CLI_PROFILE)
+endif
+ifdef AWS_CLI_REGION
+AWS_CLI_FLAGS += --region $(AWS_CLI_REGION)
+endif
 
 # generate script to login to aws docker repo
 CMD_REPOLOGIN := "aws ecr get-login-password"

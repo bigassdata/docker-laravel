@@ -67,7 +67,7 @@ To publish, bump the version in `config.env`, then:
 make release   # build without cache, test, push `<version>` to ECR, print the digest
 ```
 
-Only the immutable `<version>` tag is published (no `latest`, `MAJOR` or `MAJOR.MINOR` tags), and `make publish` refuses to overwrite a version that already exists in ECR. App images pin the Base image by tag **and** digest, using the line `make publish` prints:
+Only the immutable `<version>` tag is published (no `latest`, `MAJOR` or `MAJOR.MINOR` tags), and `make publish` refuses to overwrite a version that already exists in ECR. It pushes only after ECR explicitly reports the tag as missing, so any other lookup error (expired credentials, missing `ecr:DescribeImages` permission, network) aborts the publish. App images pin the Base image by tag **and** digest, using the line `make publish` prints:
 
 ```dockerfile
 FROM 903045850431.dkr.ecr.us-east-1.amazonaws.com/laravel-php:9.0.0@sha256:<digest>
